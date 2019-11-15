@@ -1,0 +1,31 @@
+language: node_js
+
+stages:
+  - name: checks
+    if: NOT tag =~ ^v\d+\.\d+\.\d+$
+  - name: release
+    if: branch = master AND fork = false AND type IN (push, api)
+
+jobs:
+  include:
+    - stage: checks
+      name: 'Checks Node 10'
+      node_js: 10
+      script:
+        - yarn lint
+        - yarn test
+    - stage: checks
+      name: 'Checks Node 12'
+      node_js: 12
+      script:
+        - yarn lint
+        - yarn test
+    - stage: release
+      name: 'Release'
+      node_js: lts/*
+      script: skip
+      deploy:
+        provider: script
+        skip_cleanup: true
+        script:
+          - yarn semantic-release

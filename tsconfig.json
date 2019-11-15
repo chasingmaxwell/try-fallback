@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "ES2018",
+    "strict": true,
+    "esModuleInterop": true,
+    "moduleResolution": "node",
+    "sourceMap": false,
+    "outDir": "dist",
+    "baseUrl": ".",
+    "pretty": true,
+    "removeComments": true,
+    "resolveJsonModule": true,
+    "noUnusedParameters": true,
+    "noUnusedLocals": true
+  },
+  "include": ["src/**/*"],
+  "exclude": ["src/**/*.test.ts"]
+}
