@@ -25,6 +25,27 @@ npm install try-fallback
 
 ## Usage
 
+Here's a useless example just to show you how it works:
+
+```JavaScript
+import { tryFallback } from 'try-fallback';
+
+const [implementation, result] = await tryFallback([
+  ['thisOneFails', () => {
+    throw new Error('failed!');
+  }],
+  ['addOne', i => i + 1],
+])(1);
+
+console.log(implementation);
+// addOne
+
+console.log(result);
+// 2
+```
+
+Now for some more interesting examples:
+
 ### For Resilience
 
 The simplest and most obvious use for `tryFallback` is to provide resilience to
@@ -40,11 +61,13 @@ error indicating that all available implementations have failed.
 ```JavaScript
 import { tryFallback } from 'try-fallback';
 
-const ipAddress = await tryFallback([
-  ['serverA', domainServerA.lookup(name)],
-  ['serverB', domainServerB.lookup(name)],
-  ['serverC', domainServerC.lookup(name)],
+const dnsLookup = tryFallback([
+  ['serverA', domainServerA.lookup],
+  ['serverB', domainServerB.lookup],
+  ['serverC', domainServerC.lookup],
 ]);
+
+const [implementation, ipAddress] = await dnsLookup(name);
 ```
 
 ### For managing complex business logic
@@ -62,7 +85,7 @@ watch next on a streaming platform.
 import { tryFallback } from 'try-fallback';
 
 // Here's an example "implementation" of a recommendation operation which
-// suggests the next video in a series.
+// suggests the next episode in a series.
 async function nextEpisodeImplementation() {
   const nextEpisode = await getNextEpisode();
 
@@ -79,9 +102,79 @@ async function nextEpisodeImplementation() {
 
 // I'll keep this brief and not pseudo-code the other two implementations. Hopefully you get the gist.
 
-const recommendation = await tryFallback([
-  ['nextEpisode', nextEpisodeImplementation()],
-  ['fromSimilarSeries', similarSeriesImplementation()],
-  ['fromWatchlist', watchlistImplementation()],
+const getRecommendation = tryFallback([
+  ['nextEpisode', nextEpisodeImplementation],
+  ['fromSimilarSeries', similarSeriesImplementation],
+  ['fromWatchlist', watchlistImplementation],
 ])
+
+const [implementation, recommendation] = await getRecommendation();
+```
+
+### Error handling
+
+If you need to respond to errors thrown within the implementation functions, you
+can pass an error handler to `tryFallback` as the second argument:
+
+```JavaScript
+import { tryFallback } from 'try-fallback';
+
+const doAThing = tryFallback(
+  [
+    ['thisOneFails', () => {
+      throw new Error('Whoopsie!');
+    }],
+    ['addOne', i => i + 1],
+  ],
+  // Error handler:
+  ([imp, error]) => {
+    console.log(`failed implementation: ${imp}`);
+    console.log(`error message: ${error.message}`);
+  }
+);
+
+const [implementation, result] = await doAThing(1);
+// failed implementation: thisOneFails
+// error message: Whoopsie!
+
+console.log(implementation);
+// addOne
+
+console.log(result);
+// 2
+```
+
+## API
+
+### tryFallback(implementations, errorHandler?)
+
+Returns a unary function which, when invoked, will invoke each
+implementation function in order, passing its own single argument to each and
+returning a promise which resolves with the result of the first successful
+implementation. If all implementations throw, the promise will be rejected with
+an error.
+
+**`implementations`**: An array of tuples containing the implementation name in
+the first position and the implementation function in the second.
+
+For example:
+
+```JavaScript
+[
+  ['addOne', i => i + 1],
+  ['addTwo', i => i + 2]
+]
+```
+
+**`errorHanlder?`**: An optional error handling function which is invoked each
+time an implementation throws an error, triggering a fallback. The error handler
+accepts two arguments. The first is the implementation name. The second is the
+error that was thrown.
+
+For example:
+
+```JavaScript
+(implementation, error) => {
+  console.error(`Implementation ${implementation} failed: ${error.message}`);
+}
 ```
