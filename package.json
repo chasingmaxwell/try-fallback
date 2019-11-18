@@ -2,7 +2,7 @@
   "name": "try-fallback",
   "version": "0.0.0-development",
   "description": "Return the result of the first successful implementation in a set.",
-  "main": "dist/src",
+  "main": "dist/index.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/chasingmaxwell/try-fallback.git"
