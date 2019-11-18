@@ -38,6 +38,8 @@ have three implementations, if the third fails, `tryFallback` will throw an
 error indicating that all available implementations have failed.
 
 ```JavaScript
+import { tryFallback } from 'try-fallback';
+
 const ipAddress = await tryFallback([
   ['serverA', domainServerA.lookup(name)],
   ['serverB', domainServerB.lookup(name)],
@@ -57,6 +59,8 @@ In this example we want to provide a recommendation to a user about what to
 watch next on a streaming platform.
 
 ```JavaScript
+import { tryFallback } from 'try-fallback';
+
 // Here's an example "implementation" of a recommendation operation which
 // suggests the next video in a series.
 async function nextEpisodeImplementation() {

@@ -1,4 +1,4 @@
-import tryFallback from ".";
+import { tryFallback } from ".";
 
 describe("tryFallback", () => {
   it("responds with the first successful implementation", async () => {

@@ -1,7 +1,7 @@
 /**
  * Return the result of the first successful implementation in a set.
  */
-export default function tryFallback<N extends string, I, O>(
+export function tryFallback<N extends string, I, O>(
   fns: Array<[N, (input: I) => Promise<O>]>,
   errorHandler?: (name: N, error: Error) => undefined | undefined
 ) {
