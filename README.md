@@ -166,7 +166,7 @@ For example:
 ]
 ```
 
-**`errorHanlder?`**: An optional error handling function which is invoked each
+**`errorHandler?`**: An optional error handling function which is invoked each
 time an implementation throws an error, triggering a fallback. The error handler
 accepts two arguments. The first is the implementation name. The second is the
 error that was thrown.
